@@ -1094,10 +1094,10 @@
     </div>
 
     <div class="menu-tabs">
-      <button class="tab-btn active" onclick="switchTab('soups')">🍲 Soups & Starters</button>
-      <button class="tab-btn" onclick="switchTab('mains')">🍛 Main Course</button>
-      <button class="tab-btn" onclick="switchTab('rice')">🍚 Rice & Biryani</button>
-      <button class="tab-btn" onclick="switchTab('breads')">🫓 Breads & Sides</button>
+      <button class="tab-btn active" onclick="switchTab('soups',this)">🍲 Soups & Starters</button>
+      <button class="tab-btn" onclick="switchTab('mains',this)">🍛 Main Course</button>
+      <button class="tab-btn" onclick="switchTab('rice',this)">🍚 Rice & Biryani</button>
+      <button class="tab-btn" onclick="switchTab('breads',this)">🫓 Breads & Sides</button>
     </div>
 
     <!-- Soups & Starters -->
@@ -1417,9 +1417,7 @@
       <div class="contact-right">
         <div class="contact-form">
           <div class="form-title">Make a Reservation or Enquiry</div>
-          <div id="formSuccess" class="form-success">
-            ✅ Thank you! We'll get back to you shortly.
-          </div>
+          <div id="formSuccess" class="form-success" style="display:none;"></div>
           <div id="formFields">
             <div class="form-row">
               <div class="form-group">
@@ -1506,56 +1504,58 @@
   }
 
   // Menu tabs
-  function switchTab(id) {
+  function switchTab(id, btn) {
     document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-' + id).classList.add('active');
-    event.target.classList.add('active');
+    btn.classList.add('active');
   }
 
   // Contact form → WhatsApp redirect
   function submitForm() {
-    const name    = document.getElementById('fname').value.trim();
-    const phone   = document.getElementById('fphone').value.trim();
-    const email   = document.getElementById('femail').value.trim();
-    const date    = document.getElementById('fdate').value;
-    const size    = document.getElementById('fsize').value;
-    const type    = document.getElementById('ftype').value;
-    const message = document.getElementById('fmessage').value.trim();
+    var name    = document.getElementById('fname').value.trim();
+    var phone   = document.getElementById('fphone').value.trim();
+    var email   = document.getElementById('femail').value.trim();
+    var date    = document.getElementById('fdate').value;
+    var size    = document.getElementById('fsize').value;
+    var type    = document.getElementById('ftype').value;
+    var message = document.getElementById('fmessage').value.trim();
 
     if (!name || !phone) {
-      alert('Please enter your name and phone number.');
+      alert('Please enter your name and phone number to continue.');
       return;
     }
 
-    // Build a clean WhatsApp message
-    let text = `🍽 *New Enquiry – Archanas Heritage*\n\n`;
-    text += `👤 *Name:* ${name}\n`;
-    text += `📞 *Phone:* ${phone}\n`;
-    if (email)   text += `📧 *Email:* ${email}\n`;
-    if (type)    text += `📋 *Request:* ${type}\n`;
-    if (date)    text += `📅 *Date:* ${date}\n`;
-    if (size)    text += `👨‍👩‍👧 *Party Size:* ${size}\n`;
-    if (message) text += `💬 *Message:* ${message}\n`;
+    var text = '🍽 *New Enquiry – Archanas Heritage*\n\n';
+    text += '👤 *Name:* ' + name + '\n';
+    text += '📞 *Phone:* ' + phone + '\n';
+    if (email)   text += '📧 *Email:* ' + email + '\n';
+    if (type)    text += '📋 *Request:* ' + type + '\n';
+    if (date)    text += '📅 *Date:* ' + date + '\n';
+    if (size)    text += '👨‍👩‍👧 *Party Size:* ' + size + '\n';
+    if (message) text += '💬 *Message:* ' + message + '\n';
 
-    // Replace with the restaurant's actual WhatsApp number (91 + number, no spaces/dashes)
-    const RESTAURANT_WHATSAPP = '919952113091';
+    var WHATSAPP_NUMBER = '919952113091';
+    var waURL = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(text);
 
-    const waURL = `https://wa.me/${RESTAURANT_WHATSAPP}?text=${encodeURIComponent(text)}`;
+    var successDiv = document.getElementById('formSuccess');
+    var fieldsDiv  = document.getElementById('formFields');
 
-    // Show success state then open WhatsApp
-    document.getElementById('formFields').style.display = 'none';
-    document.getElementById('formSuccess').style.display = 'block';
-    document.getElementById('formSuccess').innerHTML = `
-      ✅ <strong>Redirecting to WhatsApp…</strong><br>
-      <span style="font-size:.9rem;opacity:.8;">A pre-filled message is ready for the restaurant.</span><br><br>
-      <a href="${waURL}" target="_blank" style="color:var(--gold-lt);text-decoration:underline;">
-        Click here if WhatsApp didn't open automatically →
-      </a>
-    `;
-
-    // Auto-open WhatsApp
-    setTimeout(() => window.open(waURL, '_blank'), 600);
+    fieldsDiv.style.display  = 'none';
+    successDiv.style.display = 'block';
+    successDiv.innerHTML =
+      '<div style="padding:8px 0;">' +
+        '<div style="font-size:2.5rem;margin-bottom:12px;">✅</div>' +
+        '<div style="font-family:var(--font-head);font-size:1.3rem;color:var(--white);margin-bottom:8px;">Enquiry Ready!</div>' +
+        '<div style="font-size:.9rem;color:rgba(255,255,255,.7);margin-bottom:24px;">Tap the button below to send your details to us on WhatsApp.</div>' +
+        '<a href="' + waURL + '" target="_blank" ' +
+           'style="display:inline-flex;align-items:center;gap:10px;background:#25D366;color:#fff;' +
+                  'padding:14px 28px;border-radius:6px;font-family:var(--font-body);font-weight:600;' +
+                  'font-size:1rem;text-decoration:none;transition:background .2s;">' +
+          '💬 Open WhatsApp & Send' +
+        '</a>' +
+        '<div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-top:16px;">Opens WhatsApp with your message pre-filled</div>' +
+      '</div>';
   }
 
   // Animate on scroll
